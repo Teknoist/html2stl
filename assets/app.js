@@ -232,12 +232,12 @@
   // ----- 3D viewer -----
   function initViewer() {
     if (renderer) return;
-    renderer = new THREE.WebGLRenderer({ canvas: $("viewerCanvas"), antialias: true });
+    renderer = new THREE.WebGLRenderer({ canvas: $("viewerCanvas"), antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0e1114);
 
     camera = new THREE.PerspectiveCamera(45, 1, 0.1, 4000);
     camera.position.set(60, 45, 80);
@@ -340,7 +340,7 @@
   }
   function setBg(dark) {
     bgDark = dark;
-    if (scene) scene.background = new THREE.Color(dark ? 0x0e1114 : 0xe6e8eb);
+    $("viewport").classList.toggle("light", !dark);
   }
 
   function updateReadout() {

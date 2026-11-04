@@ -104,7 +104,8 @@ body {
 .workspace { position: absolute; inset: 0; display: flex; }
 
 /* Viewport */
-.viewport { flex: 1; min-width: 0; position: relative; background: #0e1114; }
+.viewport { flex: 1; min-width: 0; position: relative; background-color: #0d0f13; background-image: linear-gradient(rgba(120,130,150,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(120,130,150,0.07) 1px, transparent 1px), linear-gradient(rgba(120,130,150,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(120,130,150,0.16) 1px, transparent 1px); background-size: 12px 12px, 12px 12px, 60px 60px, 60px 60px; }
+.viewport.light { background-color: #eef0f3; background-image: linear-gradient(rgba(30,40,60,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(30,40,60,0.07) 1px, transparent 1px), linear-gradient(rgba(30,40,60,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(30,40,60,0.15) 1px, transparent 1px); }
 .viewport canvas { position: absolute; inset: 0; display: block; }
 
 .v-toolbar {
