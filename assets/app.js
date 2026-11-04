@@ -16,7 +16,7 @@
   var bgDark = true;
 
   // three.js
-  var renderer, scene, camera, controls, meshGroup, gridHelper;
+  var renderer, scene, camera, controls, meshGroup;
 
   var PALETTE = ["#ff8a1e", "#4cc9ff", "#3ddc97", "#f5c84c", "#ff6b9d", "#a78bfa", "#22d3ee", "#f97316", "#34d399", "#818cf8"];
 
@@ -253,9 +253,22 @@
     meshGroup = new THREE.Group();
     scene.add(meshGroup);
 
-    gridHelper = new THREE.GridHelper(200, 40, 0x333a44, 0x1c222a);
-    gridHelper.position.y = -60;
-    scene.add(gridHelper);
+    // middle-click re-centers the rotation pivot (like exocad webview)
+    var raycaster = new THREE.Raycaster();
+    var ndc = new THREE.Vector2();
+    renderer.domElement.addEventListener("pointerdown", function (e) {
+      if (e.button !== 1 || !meshGroup) return;
+      var rect = renderer.domElement.getBoundingClientRect();
+      ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(ndc, camera);
+      var hits = raycaster.intersectObjects(meshGroup.children, false);
+      if (hits.length) {
+        controls.target.copy(hits[0].point);
+        controls.update();
+      }
+    });
+    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
 
     function resize() {
       var el = $("viewport");
@@ -317,9 +330,6 @@
   function setShade(mode) {
     shadeMode = mode;
     meshes.forEach(function (m) { if (m.material) m.material.wireframe = mode === "wire"; });
-  }
-  function setGrid(on) {
-    if (gridHelper) gridHelper.visible = on;
   }
   function setBg(dark) {
     bgDark = dark;
@@ -455,7 +465,6 @@
   // view controls
   $("shadeSolid").addEventListener("click", function () { setShade("solid"); this.classList.add("is-active"); $("shadeWire").classList.remove("is-active"); });
   $("shadeWire").addEventListener("click", function () { setShade("wire"); this.classList.add("is-active"); $("shadeSolid").classList.remove("is-active"); });
-  $("gridOn").addEventListener("click", function () { setGrid(!(gridHelper && gridHelper.visible)); this.classList.toggle("is-active", gridHelper && gridHelper.visible); });
   $("bgToggle").addEventListener("click", function () { setBg(!bgDark); });
   Array.prototype.forEach.call(document.querySelectorAll("[data-orient]"), function (b) {
     b.addEventListener("click", function () { orient(this.getAttribute("data-orient")); });
