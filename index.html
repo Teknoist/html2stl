@@ -3,112 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ExoMesh Studio — exocad HTML → STL</title>
-  <meta name="description" content="exocad DentalCAD webview HTML dosyasını yükleyin, içine gömülü 3D mesh'leri (OpenCTM) çıkarın, STL olarak indirin." />
+  <title>html2stl — exocad webview → STL</title>
+  <meta name="description" content="exocad DentalCAD webview HTML dosyasındaki gömülü 3D mesh'leri çıkar, incele ve STL/OBJ/PLY olarak indir." />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <div class="bg-grid" aria-hidden="true"></div>
-  <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
-  <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
-
+  <!-- Top toolbar -->
   <header class="topbar">
-    <div class="brand">
-      <div class="brand__mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
-          <path d="M5 8a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3h-6.5L13 28v-4H8a3 3 0 0 1-3-3V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M12 10c2.2-1 4.6-1 7 0M12 14c2.2-1 4.6-1 7 0M12 18c2.2-1 4.6-1 7 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="brand__text">
-        <span class="brand__name">ExoMesh <em>Studio</em></span>
-        <span class="brand__tag">exocad · HTML → STL</span>
-      </div>
+    <div class="topbar__brand">
+      <span class="topbar__logo">html<span>2</span>stl</span>
+      <span class="topbar__sub">exocad webview dönüştürücü</span>
     </div>
-    <a class="topbar__link" href="https://github.com/Teknoist/exovue-studio" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.2-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.75.81 1.2 1.83 1.2 3.09 0 4.41-2.7 5.38-5.26 5.67.42.36.78 1.07.78 2.16v3.2c0 .31.2.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
-      GitHub
-    </a>
+    <div class="topbar__center" id="topbarCenter" hidden>
+      <span class="filetag" id="fileNameTag">—</span>
+      <span class="stat"><b id="statMeshes">0</b> mesh</span>
+      <span class="stat"><b id="statTris">0</b> üçgen</span>
+      <span class="stat"><b id="statSize">0</b></span>
+    </div>
+    <div class="topbar__actions">
+      <button class="btn btn--ghost" id="btnUploadTop" title="Yeni dosya">+ Dosya</button>
+      <button class="btn" id="btnExportAll" hidden>⬇ Tümünü indir (.zip)</button>
+    </div>
   </header>
 
-  <main class="wrap">
-    <!-- HERO -->
-    <section class="hero" id="hero">
-      <span class="hero__badge">exocad DentalCAD · OpenCTM çözücü</span>
-      <h1 class="hero__title">Webview'daki modeli <span class="grad-text">STL'e çevir.</span></h1>
-      <p class="hero__sub">exocad'in ürettiği <strong>.html</strong> dosyasını yükle — içine gömülü 3D mesh'leri (çene, diş, restorasyon) çöz, exocad'ın kendi görüntüleyicisiyle <strong>incele</strong> ve <strong>STL</strong> olarak indir. Hepsi tarayıcında, dosyan sunucuya gitmez.</p>
-
-      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="HTML dosyası yükle">
+  <!-- Empty state -->
+  <main class="stage" id="stage">
+    <section class="landing" id="landing">
+      <div class="landing__grid"></div>
+      <div class="landing__inner">
+        <div class="landing__icon">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.5 12 3 3 8.5v7L12 21l9-5.5v-7Z"/><path d="M3 8.5 12 14l9-5.5M12 14v7"/></svg>
+        </div>
+        <h1 class="landing__title">exocad <em>webview</em> dosyasını sürükle</h1>
+        <p class="landing__sub">İçindeki gömülü 3D mesh'ler (OpenCTM) çözülür, <b>STL / OBJ / PLY</b> olarak indirilir. Her şey tarayıcında — dosya sunucuya gitmez.</p>
+        <button class="btn btn--primary btn--lg" id="btnUpload">Dosya seç</button>
         <input type="file" id="fileInput" accept=".html,.htm,text/html" hidden />
-        <div class="dropzone__inner">
-          <div class="dropzone__icon">
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
-          </div>
-          <p class="dropzone__title">exocad <span>.html</span> dosyanı buraya bırak</p>
-          <p class="dropzone__hint">veya <span class="dropzone__link">gözat</span> · dosyan asla yüklenmez</p>
-        </div>
+        <p class="landing__hint">.html / .htm · OpenCTM (MG1/MG2/RAW) destekli</p>
       </div>
     </section>
 
-    <!-- WORKSPACE -->
+    <!-- Workspace (full width) -->
     <section class="workspace" id="workspace" hidden>
-      <!-- exocad's own viewer -->
-      <div class="viewer">
-        <div class="viewer__head">
-          <div class="viewer__meta">
-            <span class="file-chip" id="fileNameChip">—</span>
-            <span class="file-size" id="fileSize">—</span>
+      <!-- Viewer -->
+      <div class="viewport" id="viewport">
+        <canvas id="viewerCanvas"></canvas>
+
+        <!-- left toolbar: view controls -->
+        <div class="v-toolbar v-toolbar--left">
+          <div class="v-group">
+            <button class="v-btn is-active" id="shadeSolid" title="Katı gölgeleme">◼</button>
+            <button class="v-btn" id="shadeWire" title="Tel kafes">◇</button>
           </div>
-          <div class="viewer__actions">
-            <button class="btn btn--ghost" id="btnOpenTab" title="Yeni sekmede aç">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
-            </button>
-            <button class="btn btn--ghost" id="btnFullscreen" title="Tam ekran">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>
-            </button>
+          <div class="v-group">
+            <button class="v-btn is-active" id="gridOn" title="Izgara">⌗</button>
+            <button class="v-btn" id="bgToggle" title="Arka plan">◐</button>
+          </div>
+          <div class="v-group v-group--cols">
+            <button class="v-btn" data-orient="front" title="Ön">Ö</button>
+            <button class="v-btn" data-orient="top" title="Üst">Ü</button>
+            <button class="v-btn" data-orient="right" title="Sağ">S</button>
+            <button class="v-btn" data-orient="iso" title="İzometrik">I</button>
           </div>
         </div>
-        <div class="viewer__stage" id="viewerStage">
-          <div class="viewer__empty" id="viewerEmpty">
-            <div class="loader"></div>
-            <span>exocad görüntüleyicisi yükleniyor…</span>
-          </div>
-          <iframe id="viewerFrame" title="exocad önizleme" allow="xr-spatial-tracking; fullscreen"></iframe>
+
+        <!-- right toolbar: capture / fit -->
+        <div class="v-toolbar v-toolbar--right">
+          <button class="v-btn" id="btnFit" title="Sığdır">⤢</button>
+          <button class="v-btn" id="btnScreenshot" title="Ekran görüntüsü">📷</button>
         </div>
+
+        <!-- bottom readout -->
+        <div class="v-readout" id="vReadout">
+          <span>X <b id="dimX">—</b></span>
+          <span>Y <b id="dimY">—</b></span>
+          <span>Z <b id="dimZ">—</b></span>
+          <span class="v-readout__sep"></span>
+          <span id="vHint">🖱 sol=sürükle döndür · tekerlek=zum · sağ=taşı</span>
+        </div>
+
+        <div class="v-loading" id="vLoading" hidden><div class="spinner"></div><span>Çözülüyor…</span></div>
       </div>
 
-      <!-- Mesh list -->
-      <div class="panel">
+      <!-- Side panel -->
+      <aside class="panel" id="panel">
         <div class="panel__head">
-          <h2 class="panel__title">Çıkarılan Parçalar</h2>
-          <div class="panel__summary" id="panelSummary"></div>
+          <h2>Mesh'ler</h2>
+          <div class="panel__tools">
+            <button class="mini" id="btnSelectAll" title="Tümünü seç">☑</button>
+            <select class="fmt" id="fmtSelect" title="Format">
+              <option value="stl">STL (binary)</option>
+              <option value="stl-ascii">STL (ascii)</option>
+              <option value="obj">OBJ</option>
+              <option value="ply">PLY</option>
+            </select>
+          </div>
         </div>
-        <div class="toolbar">
-          <button class="btn btn--ghost btn--sm" id="btnSelectAll">Tümünü seç</button>
-          <button class="btn btn--primary btn--sm" id="btnDownloadSelected">Seçilenleri indir (.zip)</button>
-          <button class="btn btn--primary btn--sm" id="btnDownloadAll">Tümünü indir (.zip)</button>
+        <div class="panel__body" id="meshList"></div>
+        <div class="panel__foot">
+          <button class="btn btn--block" id="btnDownloadSelected">⬇ Seçilenleri indir (.zip)</button>
+          <button class="btn btn--block btn--mint" id="btnDownloadAll">⬇ Tümünü indir (.zip)</button>
         </div>
-        <div class="meshes" id="meshes"></div>
-        <p class="empty" id="emptyMeshes" hidden>Mesh bulunamadı.</p>
-      </div>
+      </aside>
     </section>
-
-    <div class="resetbar" id="resetbar" hidden>
-      <button class="btn btn--ghost" id="btnReset">↺ Yeni dosya yükle</button>
-    </div>
-
-    <footer class="foot">
-      <p>ExoMesh Studio — exocad DentalCAD webview dosyalarındaki OpenCTM mesh'leri STL'e çevirir. <strong>Dosyan hiçbir sunucuya yüklenmez</strong>; tüm işlem tarayıcında gerçekleşir. exocad ile bağlantısı yoktur.</p>
-    </footer>
   </main>
 
   <div class="toast" id="toast" role="status"></div>
 
-  <!-- libs -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="assets/vendor/lzma.js"></script>
   <script src="assets/vendor/ctm.js"></script>
