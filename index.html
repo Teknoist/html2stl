@@ -39,10 +39,9 @@
           <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.5 12 3 3 8.5v7L12 21l9-5.5v-7Z"/><path d="M3 8.5 12 14l9-5.5M12 14v7"/></svg>
         </div>
         <h1 class="landing__title">exocad <em>webview</em> dosyasını sürükle</h1>
-        <p class="landing__sub">İçindeki gömülü 3D mesh'ler (OpenCTM) çözülür, <b>STL / OBJ / PLY</b> olarak indirilir. Her şey tarayıcında — dosya sunucuya gitmez.</p>
+        <p class="landing__sub">İçindeki 3D mesh'ler <b>STL / OBJ / PLY</b> olarak indirilir.</p>
         <button class="btn btn--primary btn--lg" id="btnUpload">Dosya seç</button>
         <input type="file" id="fileInput" accept=".html,.htm,text/html" hidden />
-        <p class="landing__hint">.html / .htm · OpenCTM (MG1/MG2/RAW) destekli</p>
       </div>
     </section>
 
@@ -80,8 +79,6 @@
           <span>X <b id="dimX">—</b></span>
           <span>Y <b id="dimY">—</b></span>
           <span>Z <b id="dimZ">—</b></span>
-          <span class="v-readout__sep"></span>
-          <span id="vHint">🖱 sol=sürükle döndür · tekerlek=zum · sağ=taşı</span>
         </div>
 
         <div class="v-loading" id="vLoading" hidden><div class="spinner"></div><span>Çözülüyor…</span></div>
