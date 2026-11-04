@@ -242,14 +242,15 @@
     camera = new THREE.PerspectiveCamera(45, 1, 0.1, 4000);
     camera.position.set(60, 45, 80);
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.rotateSpeed = 1.4;
-    controls.minPolarAngle = 0;
-    controls.maxPolarAngle = Math.PI;
-    controls.minAzimuthAngle = -Infinity;
-    controls.maxAzimuthAngle = Infinity;
+    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls.rotateSpeed = 2.5;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.9;
+    controls.noRotate = false;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = false;
+    controls.dynamicDampingFactor = 0.2;
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x2a3038, 0.85));
     var d1 = new THREE.DirectionalLight(0xffffff, 0.9); d1.position.set(90, 140, 70); scene.add(d1);
@@ -263,6 +264,7 @@
     var ndc = new THREE.Vector2();
     renderer.domElement.addEventListener("pointerdown", function (e) {
       if (e.button !== 1 || !meshGroup) return;
+      e.preventDefault();
       var rect = renderer.domElement.getBoundingClientRect();
       ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -273,7 +275,6 @@
         controls.update();
       }
     });
-    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
 
     function resize() {
       var el = $("viewport");
@@ -281,6 +282,7 @@
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      if (controls.handleResize) controls.handleResize();
     }
     window.addEventListener("resize", resize);
     new ResizeObserver(resize).observe($("viewport"));
