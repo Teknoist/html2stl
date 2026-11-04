@@ -244,7 +244,12 @@
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.09;
+    controls.dampingFactor = 0.06;
+    controls.rotateSpeed = 1.4;
+    controls.minPolarAngle = 0;
+    controls.maxPolarAngle = Math.PI;
+    controls.minAzimuthAngle = -Infinity;
+    controls.maxAzimuthAngle = Infinity;
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x2a3038, 0.85));
     var d1 = new THREE.DirectionalLight(0xffffff, 0.9); d1.position.set(90, 140, 70); scene.add(d1);
